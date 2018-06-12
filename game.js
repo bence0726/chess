@@ -21,33 +21,24 @@ var makeRandomMove = function() {
   return possibleMoves[randomIndex];
 };
 
-var calculateBestMove = function () {
+var minimaxRoot =function() {
 
-  var newGameMoves = game.moves();
-  console.log(newGameMoves);
-  var bestMove = null;
-  //use any negative large number
-  var bestValue = -9999;
+    var newGameMoves = game.moves();
+    var bestMove = 9999;
+    var bestMoveFound;
 
-  for (var i = 0; i < newGameMoves.length; i++) {
-      var newGameMove = newGameMoves[i];
-      game.move(newGameMove);
-
-      //take the negative as AI plays as black
-      var boardValue = -evaluateBoard(game.board());
-      game.undo();
-      if (boardValue > bestValue) {
-          bestValue = boardValue;
-          bestMove = newGameMove;
-      }
-  }
-  if (bestValue === 0){
-    game.move(makeRandomMove());
-  }else{
-    game.move(bestMove);
-  }
-  board.position(game.fen());
-
+    for(var i = 0; i < newGameMoves.length; i++) {
+        var newGameMove = newGameMoves[i]
+        game.move(newGameMove);
+        var value = minimax(1, game, true);
+        game.undo();
+        if(value <= bestMove) {
+            bestMove = value;
+            bestMoveFound = newGameMove;
+        }
+    }
+    game.move(bestMoveFound);
+    board.position(game.fen());;
 };
 
 var evaluateBoard = function (board) {
@@ -85,6 +76,30 @@ var getPieceValue = function (piece) {
   return piece.color === 'w' ? absoluteValue : -absoluteValue;
 };
 
+var minimax = function (depth, game, isMaximisingPlayer) {
+  if (depth === 0) {
+      return evaluateBoard(game.board());
+  }
+  var newGameMoves = game.moves();
+  if (isMaximisingPlayer) {
+      var bestMove = -9999;
+      for (var i = 0; i < newGameMoves.length; i++) {
+          game.move(newGameMoves[i]);
+          bestMove = Math.max(bestMove, minimax(depth - 1, game, !isMaximisingPlayer));
+          game.undo();
+      }
+      return bestMove;
+  } else {
+      var bestMove = 9999;
+      for (var i = 0; i < newGameMoves.length; i++) {
+          game.move(newGameMoves[i]);
+          bestMove = Math.min(bestMove, minimax(depth - 1, game, !isMaximisingPlayer));
+          game.undo();
+      }
+      return bestMove;
+  }
+};
+
 var onDrop = function(source, target) {
   // see if the move is legal
   var move = game.move({
@@ -97,7 +112,7 @@ var onDrop = function(source, target) {
   if (move === null) return 'snapback';
 
   // make random legal move for black
-  window.setTimeout(calculateBestMove, 250);
+  window.setTimeout(minimaxRoot, 250);
 };
 
 // update the board position after the piece snap
