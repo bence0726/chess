@@ -30,7 +30,7 @@ var minimaxRoot =function() {
     for(var i = 0; i < newGameMoves.length; i++) {
         var newGameMove = newGameMoves[i]
         game.move(newGameMove);
-        var value = minimax(1, game, true);
+        var value = minimax(2, game, -10000, 10000, true);
         game.undo();
         if(value <= bestMove) {
             bestMove = value;
@@ -76,7 +76,7 @@ var getPieceValue = function (piece) {
   return piece.color === 'w' ? absoluteValue : -absoluteValue;
 };
 
-var minimax = function (depth, game, isMaximisingPlayer) {
+var minimax = function (depth, game,alpha,beta, isMaximisingPlayer) {
   if (depth === 0) {
       return evaluateBoard(game.board());
   }
@@ -85,16 +85,24 @@ var minimax = function (depth, game, isMaximisingPlayer) {
       var bestMove = -9999;
       for (var i = 0; i < newGameMoves.length; i++) {
           game.move(newGameMoves[i]);
-          bestMove = Math.max(bestMove, minimax(depth - 1, game, !isMaximisingPlayer));
+          bestMove = Math.max(bestMove, minimax(depth - 1, game,alpha,beta, !isMaximisingPlayer));
           game.undo();
+          alpha = Math.max(alpha, bestMove);
+            if (beta <= alpha) {
+                return bestMove;
+            }
       }
       return bestMove;
   } else {
       var bestMove = 9999;
       for (var i = 0; i < newGameMoves.length; i++) {
           game.move(newGameMoves[i]);
-          bestMove = Math.min(bestMove, minimax(depth - 1, game, !isMaximisingPlayer));
+          bestMove = Math.min(bestMove, minimax(depth - 1, game,alpha,beta, !isMaximisingPlayer));
           game.undo();
+          beta = Math.min(beta, bestMove);
+            if (beta <= alpha) {
+                return bestMove;
+            }
       }
       return bestMove;
   }
@@ -112,7 +120,7 @@ var onDrop = function(source, target) {
   if (move === null) return 'snapback';
 
   // make random legal move for black
-  window.setTimeout(minimaxRoot, 250);
+  window.setTimeout(minimaxRoot, 1);
 };
 
 // update the board position after the piece snap
