@@ -41,7 +41,7 @@ var calculateBestMove = function () {
           bestMove = newGameMove;
       }
   }
-  if (bestValue === 0){
+  if (bestValue === evaluateBoard(game.board())){
     game.move(makeRandomMove());
   }else{
     game.move(bestMove);
