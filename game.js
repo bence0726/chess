@@ -27,16 +27,16 @@ var calculateBestMove = function () {
   console.log(newGameMoves);
   var bestMove = null;
   //use any negative large number
-  var bestValue = -9999;
+  var bestValue = 9999;
 
   for (var i = 0; i < newGameMoves.length; i++) {
       var newGameMove = newGameMoves[i];
       game.move(newGameMove);
 
       //take the negative as AI plays as black
-      var boardValue = -evaluateBoard(game.board());
+      var boardValue = evaluateBoard(game.board());
       game.undo();
-      if (boardValue > bestValue) {
+      if (boardValue < bestValue) {
           bestValue = boardValue;
           bestMove = newGameMove;
       }
