@@ -1,6 +1,7 @@
 
 var board;
 var game = new Chess();
+var positionCount = 0;
 
 // do not pick up pieces if the game is over
 // only pick up pieces for White
@@ -23,6 +24,8 @@ var makeRandomMove = function() {
 
 var minimaxRoot =function() {
 
+    positionCount = 0;
+    console.log(positionCount);
     var newGameMoves = game.moves();
     var bestMove = 9999;
     var bestMoveFound;
@@ -37,6 +40,7 @@ var minimaxRoot =function() {
             bestMoveFound = newGameMove;
         }
     }
+    console.log(positionCount);
     game.move(bestMoveFound);
     board.position(game.fen());;
 };
@@ -77,6 +81,9 @@ var getPieceValue = function (piece) {
 };
 
 var minimax = function (depth, game,alpha,beta, isMaximisingPlayer) {
+
+  positionCount++;
+
   if (depth === 0) {
       return evaluateBoard(game.board());
   }
@@ -120,7 +127,8 @@ var onDrop = function(source, target) {
   if (move === null) return 'snapback';
 
   // make random legal move for black
-  window.setTimeout(minimaxRoot, 1);
+  window.setTimeout(minimaxRoot, 250);
+  
 };
 
 // update the board position after the piece snap
